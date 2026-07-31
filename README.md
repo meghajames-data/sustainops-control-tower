@@ -8,6 +8,17 @@ SustainOps Control Tower combines multiple operational datasets into one decisio
 
 ## Main Features
 
+## Application Screenshots
+
+### Energy Intelligence Dashboard
+
+![Energy Intelligence Dashboard](reports/documentation/energy-intelligence-dashboard.png)
+
+### Energy Anomaly Detection
+
+![Energy Anomaly Detection](reports/documentation/energy-anomaly-detection.png)
+
+
 ### Manufacturing Intelligence
 - Production and material-efficiency KPIs
 - Energy intensity and defect-rate analysis
