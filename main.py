@@ -1,7 +1,9 @@
 from pathlib import Path
+from textwrap import dedent
 
 import pandas as pd
 import streamlit as st
+import plotly.graph_objects as go
 from src.storage.action_storage import load_actions, save_actions
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -13,6 +15,654 @@ st.set_page_config(
     page_icon="🌱",
     layout="wide",
 )
+
+# -------------------------------------------------
+# GREEN + WHITE SUSTAINABILITY THEME
+# -------------------------------------------------
+
+st.markdown(
+    """
+    <style>
+    :root {
+        --green-dark: #071A12;
+        --green-panel: #0B2418;
+        --green-primary: #22C55E;
+        --green-light: #86EFAC;
+        --white: #FFFFFF;
+        --white-soft: #F2FFF6;
+        --border: rgba(134, 239, 172, 0.24);
+    }
+
+    .stApp {
+        background:
+            radial-gradient(circle at 10% 0%, rgba(34,197,94,0.16), transparent 30%),
+            radial-gradient(circle at 95% 100%, rgba(34,197,94,0.10), transparent 28%),
+            linear-gradient(135deg, #06150E 0%, #082117 48%, #0C2D1E 100%);
+        background-attachment: fixed;
+        color: var(--white);
+    }
+
+    .stApp,
+    .stApp p,
+    .stApp label {
+        color: var(--white-soft);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #06150E 0%, #0A2A1B 100%);
+        border-right: 1px solid var(--border);
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #FFFFFF !important;
+    }
+
+    div[data-testid="stMetric"] {
+        background: linear-gradient(145deg, rgba(34,197,94,0.10), rgba(255,255,255,0.035));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+    }
+
+    div[data-testid="stMetricLabel"] * {
+        color: #CFF7DB !important;
+    }
+
+    div[data-testid="stMetricValue"] * {
+        color: #FFFFFF !important;
+    }
+
+    .stButton > button,
+    .stFormSubmitButton > button {
+        background: linear-gradient(90deg, #16A34A, #22C55E) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255,255,255,0.14) !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+    }
+
+    .stButton > button:hover,
+    .stFormSubmitButton > button:hover {
+        background: linear-gradient(90deg, #22C55E, #4ADE80) !important;
+        color: #FFFFFF !important;
+        border-color: #86EFAC !important;
+        box-shadow: 0 8px 20px rgba(34,197,94,0.24);
+    }
+
+    .stTextInput input,
+    .stNumberInput input,
+    .stDateInput input,
+    .stTextArea textarea {
+        background: rgba(255,255,255,0.07) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(134,239,172,0.28) !important;
+        border-radius: 10px !important;
+    }
+
+    div[data-baseweb="select"] > div {
+        background: rgba(255,255,255,0.07) !important;
+        border-color: rgba(134,239,172,0.28) !important;
+        color: #FFFFFF !important;
+    }
+
+    span[data-baseweb="tag"] {
+        background-color: #16A34A !important;
+        border-color: #4ADE80 !important;
+    }
+
+    span[data-baseweb="tag"] *,
+    span[data-baseweb="tag"] svg {
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
+    }
+
+    ul[data-baseweb="menu"],
+    div[data-baseweb="popover"] {
+        background-color: #0B2418 !important;
+    }
+
+    li[role="option"] {
+        color: #FFFFFF !important;
+    }
+
+    li[role="option"]:hover {
+        background-color: rgba(34,197,94,0.18) !important;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+        accent-color: #22C55E !important;
+    }
+
+    div[data-baseweb="slider"] div[role="slider"] {
+        background-color: #22C55E !important;
+        border-color: #86EFAC !important;
+    }
+
+    div[data-testid="stDataFrame"],
+    div[data-testid="stPlotlyChart"] {
+        background: rgba(255,255,255,0.035);
+        border: 1px solid rgba(134,239,172,0.16);
+        border-radius: 14px;
+        padding: 8px;
+    }
+
+    div[data-testid="stAlert"] {
+        background: rgba(22,163,74,0.12) !important;
+        border: 1px solid rgba(74,222,128,0.35) !important;
+        color: #FFFFFF !important;
+        border-radius: 12px !important;
+    }
+
+    div[data-testid="stAlert"] * {
+        color: #F2FFF6 !important;
+    }
+
+    a {
+        color: #86EFAC !important;
+    }
+
+    a:hover {
+        color: #FFFFFF !important;
+    }
+
+    hr {
+        border-color: rgba(134,239,172,0.18) !important;
+    }
+
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #06150E;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #1F7A46;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #22C55E;
+    }
+
+    /* Home hero */
+    .sustainops-hero {
+        padding: 34px 36px;
+        border-radius: 22px;
+        background: linear-gradient(
+            135deg,
+            rgba(34,197,94,0.18),
+            rgba(255,255,255,0.035)
+        );
+        border: 1px solid rgba(134,239,172,0.28);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.20);
+        margin: 6px 0 28px 0;
+    }
+
+    .sustainops-eyebrow {
+        font-size: 13px;
+        letter-spacing: 2.2px;
+        font-weight: 700;
+        color: #86EFAC !important;
+        margin-bottom: 10px;
+    }
+
+    .sustainops-title {
+        font-size: clamp(34px, 4vw, 52px);
+        line-height: 1.08;
+        font-weight: 800;
+        color: #FFFFFF !important;
+        margin-bottom: 14px;
+    }
+
+    .sustainops-subtitle {
+        max-width: 900px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #E9FFF0 !important;
+    }
+
+    /* Home module cards */
+    .module-card {
+        min-height: 190px;
+        padding: 24px;
+        border-radius: 16px;
+        background: linear-gradient(
+            145deg,
+            rgba(34,197,94,0.10),
+            rgba(255,255,255,0.035)
+        );
+        border: 1px solid rgba(134,239,172,0.20);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+    }
+
+    .module-icon {
+        font-size: 28px;
+        margin-bottom: 14px;
+    }
+
+    .module-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: #FFFFFF !important;
+        margin-bottom: 10px;
+    }
+
+    .module-text {
+        font-size: 15px;
+        line-height: 1.55;
+        color: #DDFBE6 !important;
+    }
+
+    /* -------------------------------------------------
+       DARK GREEN TABLES / DATAFRAMES
+       ------------------------------------------------- */
+
+    div[data-testid="stDataFrame"] {
+        background: #0B2418 !important;
+        border: 1px solid rgba(134,239,172,0.22) !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+    }
+
+    /* Try to keep dataframe canvas/container in dark green */
+    div[data-testid="stDataFrame"] > div {
+        background: #0B2418 !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="grid"] {
+        background: #0B2418 !important;
+        color: #F2FFF6 !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="columnheader"] {
+        background: #123A27 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid rgba(134,239,172,0.22) !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="gridcell"] {
+        background: #0D2B1D !important;
+        color: #F2FFF6 !important;
+        border-color: rgba(134,239,172,0.10) !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="row"]:nth-child(even) [role="gridcell"] {
+        background: #103523 !important;
+    }
+
+    /* Data editor */
+    div[data-testid="stDataEditor"] {
+        background: #0B2418 !important;
+        border: 1px solid rgba(134,239,172,0.22) !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="columnheader"] {
+        background: #123A27 !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="gridcell"] {
+        background: #0D2B1D !important;
+        color: #F2FFF6 !important;
+    }
+
+    /* -------------------------------------------------
+       LIGHT-GREEN SLIDERS
+       ------------------------------------------------- */
+
+    div[data-baseweb="slider"] {
+        --slider-track-color: #86EFAC;
+    }
+
+    div[data-baseweb="slider"] > div > div {
+        background-color: rgba(134,239,172,0.26) !important;
+    }
+
+    div[data-baseweb="slider"] div[role="slider"] {
+        background-color: #86EFAC !important;
+        border: 2px solid #FFFFFF !important;
+        box-shadow: 0 0 0 3px rgba(134,239,172,0.20) !important;
+    }
+
+    div[data-baseweb="slider"] div[role="slider"]:hover {
+        background-color: #BBF7D0 !important;
+        border-color: #FFFFFF !important;
+    }
+
+    /* Streamlit slider filled track */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div:nth-child(2) {
+        background-color: #86EFAC !important;
+    }
+
+    /* Slider value labels */
+    div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+        color: #FFFFFF !important;
+        background: #166534 !important;
+        border: 1px solid #86EFAC !important;
+    }
+
+    /* -------------------------------------------------
+       REMOVE RED ACCENTS FROM SELECTED CONTROLS
+       ------------------------------------------------- */
+
+    span[data-baseweb="tag"] {
+        background-color: #4ADE80 !important;
+        border-color: #86EFAC !important;
+    }
+
+    span[data-baseweb="tag"] * {
+        color: #062412 !important;
+        fill: #062412 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Radio selection */
+    div[role="radiogroup"] [data-baseweb="radio"] > div:first-child {
+        border-color: #86EFAC !important;
+    }
+
+    div[role="radiogroup"] [aria-checked="true"] > div:first-child,
+    div[role="radiogroup"] [data-checked="true"] > div:first-child {
+        background-color: #86EFAC !important;
+        border-color: #86EFAC !important;
+    }
+
+    /* Checkbox selection */
+    div[data-baseweb="checkbox"] [aria-checked="true"],
+    div[data-baseweb="checkbox"] [data-checked="true"] {
+        background-color: #86EFAC !important;
+        border-color: #86EFAC !important;
+    }
+
+
+    /* =================================================
+       STREAMLIT SLIDER — FULL LIGHT-GREEN RAIL + THUMB
+       ================================================= */
+
+    /* BaseWeb slider rail/track */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div {
+        background: #86EFAC !important;
+    }
+
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div {
+        background: #86EFAC !important;
+    }
+
+    /* Newer Streamlit/BaseWeb track pieces */
+    div[data-testid="stSlider"] [data-baseweb="slider"] [role="presentation"] {
+        background: #86EFAC !important;
+    }
+
+    /* Force both selected and unselected portions to same light green */
+    div[data-testid="stSlider"] [data-baseweb="slider"] div[style*="background"] {
+        background: #86EFAC !important;
+        background-color: #86EFAC !important;
+    }
+
+    /* Slider thumb */
+    div[data-testid="stSlider"] div[role="slider"] {
+        background: #BBF7D0 !important;
+        background-color: #BBF7D0 !important;
+        border: 2px solid #166534 !important;
+        box-shadow: 0 0 0 2px rgba(187,247,208,0.35) !important;
+    }
+
+    /* Slider value bubble */
+    div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        border: 1px solid #166534 !important;
+    }
+
+    /* =================================================
+       DATAFRAME OUTER FRAME — LIGHT GREEN
+       ================================================= */
+
+    div[data-testid="stDataFrame"] {
+        background: #DCFCE7 !important;
+        border: 1px solid #166534 !important;
+        border-radius: 12px !important;
+    }
+
+    div[data-testid="stDataFrame"] > div {
+        background: #DCFCE7 !important;
+    }
+
+
+    /* =================================================
+       FINAL COLOR OVERRIDES
+       Dark app background + readable white text
+       ================================================= */
+
+    /* Keep the overall app dark. Never make page backgrounds light green. */
+    .stApp {
+        background:
+            radial-gradient(circle at 10% 0%, rgba(34,197,94,0.16), transparent 30%),
+            radial-gradient(circle at 95% 100%, rgba(34,197,94,0.10), transparent 28%),
+            linear-gradient(135deg, #06150E 0%, #082117 48%, #0C2D1E 100%) !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Default text on dark surfaces */
+    .stApp p,
+    .stApp label,
+    .stApp h1,
+    .stApp h2,
+    .stApp h3,
+    .stApp h4,
+    .stApp h5,
+    .stApp h6 {
+        color: #FFFFFF !important;
+    }
+
+    /* Sidebar stays dark with white text */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #06150E 0%, #0A2A1B 100%) !important;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #FFFFFF !important;
+    }
+
+    /* =================================================
+       TABLES
+       Light-green body + light-green header
+       Dark-green text + dark-green borders
+       ================================================= */
+
+    div[data-testid="stDataFrame"] {
+        background: #DCFCE7 !important;
+        border: 1px solid #166534 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+
+    div[data-testid="stDataFrame"] > div,
+    div[data-testid="stDataFrame"] [role="grid"] {
+        background: #DCFCE7 !important;
+    }
+
+    /* Column headers */
+    div[data-testid="stDataFrame"] [role="columnheader"] {
+        background: #BBF7D0 !important;
+        color: #14532D !important;
+        border: 1px solid #166534 !important;
+        font-weight: 800 !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="columnheader"] * {
+        color: #14532D !important;
+        font-weight: 800 !important;
+    }
+
+    /* Table cells */
+    div[data-testid="stDataFrame"] [role="gridcell"] {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        border-color: #166534 !important;
+    }
+
+    div[data-testid="stDataFrame"] [role="gridcell"] * {
+        color: #14532D !important;
+    }
+
+    /* Slight alternating shade for readability */
+    div[data-testid="stDataFrame"] [role="row"]:nth-child(even) [role="gridcell"] {
+        background: #D1FAE5 !important;
+    }
+
+    /* Data editor gets the same look */
+    div[data-testid="stDataEditor"] {
+        background: #DCFCE7 !important;
+        border: 1px solid #166534 !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="columnheader"] {
+        background: #BBF7D0 !important;
+        color: #14532D !important;
+        font-weight: 800 !important;
+        border-color: #166534 !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="columnheader"] * {
+        color: #14532D !important;
+        font-weight: 800 !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="gridcell"] {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        border-color: #166534 !important;
+    }
+
+    div[data-testid="stDataEditor"] [role="gridcell"] * {
+        color: #14532D !important;
+    }
+
+    /* =================================================
+       SLIDERS
+       Entire rail light green
+       ================================================= */
+
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div,
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div,
+    div[data-testid="stSlider"] [data-baseweb="slider"] [role="presentation"] {
+        background: #86EFAC !important;
+        background-color: #86EFAC !important;
+    }
+
+    /* Force every visible slider track segment to light green */
+    div[data-testid="stSlider"] [data-baseweb="slider"] div[style*="background"] {
+        background: #86EFAC !important;
+        background-color: #86EFAC !important;
+    }
+
+    div[data-testid="stSlider"] div[role="slider"] {
+        background: #BBF7D0 !important;
+        border: 2px solid #166534 !important;
+        box-shadow: 0 0 0 2px rgba(187,247,208,0.35) !important;
+    }
+
+    div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        border: 1px solid #166534 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Inputs on dark background should remain readable */
+    .stTextInput input,
+    .stNumberInput input,
+    .stDateInput input,
+    .stTextArea textarea {
+        background: rgba(255,255,255,0.07) !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Keep green information/metric cards dark enough for white text */
+    div[data-testid="stMetric"],
+    div[data-testid="stAlert"],
+    .module-card,
+    .sustainops-hero {
+        color: #FFFFFF !important;
+    }
+
+    div[data-testid="stMetric"] *,
+    div[data-testid="stAlert"] *,
+    .module-card *,
+    .sustainops-hero * {
+        color: inherit;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+def green_table_style(dataframe: pd.DataFrame):
+    """Light-green table body and header with dark-green bold headings."""
+    return (
+        dataframe.style
+        .set_properties(
+            **{
+                "background-color": "#DCFCE7",
+                "color": "#14532D",
+                "border": "1px solid #166534",
+            }
+        )
+        .set_table_styles(
+            [
+                {
+                    "selector": "thead th",
+                    "props": [
+                        ("background-color", "#BBF7D0"),
+                        ("color", "#14532D"),
+                        ("border", "1px solid #166534"),
+                        ("font-weight", "800"),
+                        ("text-align", "left"),
+                    ],
+                },
+                {
+                    "selector": "tbody td",
+                    "props": [
+                        ("background-color", "#DCFCE7"),
+                        ("color", "#14532D"),
+                        ("border", "1px solid #166534"),
+                    ],
+                },
+                {
+                    "selector": "tbody th",
+                    "props": [
+                        ("background-color", "#BBF7D0"),
+                        ("color", "#14532D"),
+                        ("border", "1px solid #166534"),
+                        ("font-weight", "800"),
+                    ],
+                },
+            ]
+        )
+    )
 
 
 @st.cache_data
@@ -46,6 +696,7 @@ def load_data() -> dict[str, pd.DataFrame]:
     return datasets
 
 
+
 def render_sidebar() -> str:
     """Render application navigation."""
 
@@ -77,15 +728,17 @@ def render_sidebar() -> str:
 def render_home(datasets: dict[str, pd.DataFrame]) -> None:
     """Render the application landing page."""
 
-    st.title("SustainOps Control Tower")
-
-    st.write(
-        """
-        A sustainability operations application for analysing
-        manufacturing efficiency, industrial energy use and logistics
-        performance.
-        """
-    )
+    # Use st.html so the hero is rendered as HTML and never shown as a code block.
+    st.html("""
+<div class="sustainops-hero">
+    <div class="sustainops-eyebrow">SUSTAINABILITY OPERATIONS INTELLIGENCE</div>
+    <div class="sustainops-title">SustainOps Control Tower</div>
+    <div class="sustainops-subtitle">
+        Transforming manufacturing, energy and logistics data into sustainability
+        insights, operational priorities and actionable decisions.
+    </div>
+</div>
+""")
 
     total_rows = sum(len(dataframe) for dataframe in datasets.values())
 
@@ -102,39 +755,42 @@ def render_home(datasets: dict[str, pd.DataFrame]) -> None:
         f"{len(datasets['steel_energy']):,}",
     )
 
-    st.subheader("Application modules")
+    st.markdown("### Application Modules")
 
     module_col1, module_col2, module_col3 = st.columns(3)
 
     with module_col1:
-        st.info(
-            """
-            **Manufacturing Intelligence**
-
-            Analyse production output, material efficiency,
-            recycled content and defect rates.
-            """
-        )
+        st.html("""
+<div class="module-card">
+    <div class="module-icon">⚙️</div>
+    <div class="module-title">Manufacturing Intelligence</div>
+    <div class="module-text">
+        Analyse production output, material efficiency, recycled content and defect rates.
+    </div>
+</div>
+""")
 
     with module_col2:
-        st.info(
-            """
-            **Energy Intelligence**
-
-            Analyse industrial electricity consumption,
-            CO₂ emissions and load behaviour.
-            """
-        )
+        st.html("""
+<div class="module-card">
+    <div class="module-icon">⚡</div>
+    <div class="module-title">Energy Intelligence</div>
+    <div class="module-text">
+        Analyse industrial electricity consumption, CO₂ emissions and load behaviour.
+    </div>
+</div>
+""")
 
     with module_col3:
-        st.info(
-            """
-            **Logistics Intelligence**
-
-            Analyse orders, freight rates, plants,
-            ports and delivery performance.
-            """
-        )
+        st.html("""
+<div class="module-card">
+    <div class="module-icon">🚚</div>
+    <div class="module-title">Logistics Intelligence</div>
+    <div class="module-text">
+        Analyse orders, freight rates, plants, ports and delivery performance.
+    </div>
+</div>
+""")
 
 
 def render_data_overview(
@@ -164,8 +820,8 @@ def render_data_overview(
     summary = pd.DataFrame(summary_rows)
 
     st.dataframe(
-        summary,
-        use_container_width=True,
+        green_table_style(summary),
+        width="stretch",
         hide_index=True,
     )
 
@@ -179,8 +835,8 @@ def render_data_overview(
     st.subheader(selected_dataset.replace("_", " ").title())
 
     st.dataframe(
-        selected_dataframe.head(100),
-        use_container_width=True,
+        green_table_style(selected_dataframe.head(100)),
+        width="stretch",
     )
 
 def render_manufacturing(
@@ -452,8 +1108,8 @@ def render_manufacturing(
     )
 
     st.dataframe(
-        priority_table,
-        use_container_width=True,
+        green_table_style(priority_table),
+        width="stretch",
         hide_index=True,
     )
 
@@ -651,16 +1307,117 @@ def render_energy(
     )
 
     chart_col1, chart_col2 = st.columns(2)
+
+    # ENERGY CHART
     with chart_col1:
-        st.subheader("Average energy use by hour")
-        st.line_chart(
-            hourly_summary.set_index("hour")["average_energy_usage_kwh"]
+        energy_fig = go.Figure()
+
+        energy_fig.add_trace(
+            go.Scatter(
+                x=hourly_summary["hour"],
+                y=hourly_summary["average_energy_usage_kwh"],
+                mode="lines+markers",
+                name="Energy Use",
+                line=dict(color="#22C55E", width=4, shape="spline"),
+                marker=dict(
+                    size=7,
+                    color="#86EFAC",
+                    line=dict(width=2, color="#14532D"),
+                ),
+                fill="tozeroy",
+                fillcolor="rgba(34, 197, 94, 0.12)",
+                hovertemplate=(
+                    "<b>Hour %{x}:00</b><br>"
+                    "Energy: %{y:.2f} kWh"
+                    "<extra></extra>"
+                ),
+            )
         )
 
+        energy_fig.update_layout(
+            title={"text": "⚡ Average Energy Use by Hour", "x": 0.02, "xanchor": "left"},
+            height=430,
+            margin=dict(l=20, r=20, t=65, b=20),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(255,255,255,0.025)",
+            font=dict(color="#FFFFFF", size=13),
+            hovermode="x unified",
+            showlegend=False,
+            xaxis=dict(
+                title="Hour of Day",
+                showgrid=False,
+                tickmode="linear",
+                dtick=2,
+                color="#FFFFFF",
+            ),
+            yaxis=dict(
+                title="Energy Use (kWh)",
+                gridcolor="rgba(255,255,255,0.10)",
+                zeroline=False,
+                color="#FFFFFF",
+            ),
+        )
+
+        st.plotly_chart(
+            energy_fig,
+            width="stretch",
+            config={"displayModeBar": False},
+        )
+
+    # CO2 CHART
     with chart_col2:
-        st.subheader("Average CO₂ emissions by hour")
-        st.line_chart(
-            hourly_summary.set_index("hour")["average_co2_emissions_tco2"]
+        co2_fig = go.Figure()
+
+        co2_fig.add_trace(
+            go.Scatter(
+                x=hourly_summary["hour"],
+                y=hourly_summary["average_co2_emissions_tco2"],
+                mode="lines+markers",
+                name="CO₂ Emissions",
+                line=dict(color="#4ADE80", width=4, shape="spline"),
+                marker=dict(
+                    size=7,
+                    color="#FFFFFF",
+                    line=dict(width=2, color="#22C55E"),
+                ),
+                fill="tozeroy",
+                fillcolor="rgba(74, 222, 128, 0.10)",
+                hovertemplate=(
+                    "<b>Hour %{x}:00</b><br>"
+                    "CO₂: %{y:.4f} tCO₂"
+                    "<extra></extra>"
+                ),
+            )
+        )
+
+        co2_fig.update_layout(
+            title={"text": "🌱 Average CO₂ Emissions by Hour", "x": 0.02, "xanchor": "left"},
+            height=430,
+            margin=dict(l=20, r=20, t=65, b=20),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(255,255,255,0.025)",
+            font=dict(color="#FFFFFF", size=13),
+            hovermode="x unified",
+            showlegend=False,
+            xaxis=dict(
+                title="Hour of Day",
+                showgrid=False,
+                tickmode="linear",
+                dtick=2,
+                color="#FFFFFF",
+            ),
+            yaxis=dict(
+                title="CO₂ Emissions (tCO₂)",
+                gridcolor="rgba(255,255,255,0.10)",
+                zeroline=False,
+                color="#FFFFFF",
+            ),
+        )
+
+        st.plotly_chart(
+            co2_fig,
+            width="stretch",
+            config={"displayModeBar": False},
         )
 
     st.subheader("Energy anomaly detection")
@@ -679,17 +1436,12 @@ def render_energy(
 
     anomaly_data = filtered.sort_values("date").copy()
     anomaly_data["day_type"] = anomaly_data["week_status"].fillna("Unknown")
-
     anomaly_data["minute_slot"] = (
         anomaly_data["date"].dt.hour * 4
         + anomaly_data["date"].dt.minute // 15
-)
+    )
 
-    baseline_group_columns = [
-        "load_type",
-        "day_type",
-        "minute_slot",
-]
+    baseline_group_columns = ["load_type", "day_type", "minute_slot"]
 
     anomaly_data["expected_energy_kwh"] = (
         anomaly_data.groupby(baseline_group_columns)["energy_usage_kwh"]
@@ -753,8 +1505,8 @@ def render_energy(
         if not anomalies.empty
         else 0
     )
-    anomaly_col3.metric("Largest deviation", f"{maximum_deviation:.2f}%")
 
+    anomaly_col3.metric("Largest deviation", f"{maximum_deviation:.2f}%")
     st.subheader("Detected anomaly records")
 
     if anomalies.empty:
@@ -774,14 +1526,11 @@ def render_energy(
             "day_of_week",
             "hour",
         ]
-    ].sort_values(
-        "robust_anomaly_score",
-        ascending=False,
-    )
+    ].sort_values("robust_anomaly_score", ascending=False)
 
     st.dataframe(
-        anomaly_display.head(100),
-        use_container_width=True,
+        green_table_style(anomaly_display.head(100)),
+        width="stretch",
         hide_index=True,
     )
 
@@ -809,7 +1558,6 @@ def render_energy(
         behaviour during this interval.
         """
     )
-
 
 def render_logistics(
     orders: pd.DataFrame,
@@ -956,11 +1704,13 @@ def render_logistics(
     st.subheader("Carrier Performance")
 
     st.dataframe(
-        carrier_summary.sort_values(
-            "late_delivery_rate_pct",
-            ascending=False,
+        green_table_style(
+            carrier_summary.sort_values(
+                "late_delivery_rate_pct",
+                ascending=False,
+            )
         ),
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
@@ -1087,8 +1837,8 @@ def render_logistics(
         )
     ]
     st.dataframe(
-        displayed_orders.head(100),
-        use_container_width=True,
+        green_table_style(displayed_orders.head(100)),
+        width="stretch",
         hide_index=True,
     )
 
@@ -1343,8 +2093,8 @@ def render_scenario_simulator(
     )
 
     st.dataframe(
-        comparison,
-        use_container_width=True,
+        green_table_style(comparison),
+        width="stretch",
         hide_index=True,
     )
     net_five_year_benefit = (
@@ -1510,8 +2260,8 @@ def render_opportunity_prioritisation() -> None:
     ).reset_index(drop=True)
 
     st.dataframe(
-        ranked,
-        use_container_width=True,
+        green_table_style(ranked),
+        width="stretch",
         hide_index=True,
     )
     
@@ -1565,6 +2315,21 @@ def render_opportunity_prioritisation() -> None:
             the opportunity into the action plan.
             """
         )
+        if st.button("Add top opportunity to Action Tracker"):
+            st.session_state.pending_opportunity = {
+                "action_title": top_opportunity["opportunity"],
+                "expected_co2_reduction_tco2": float(
+                    top_opportunity["co2_reduction_tco2"]
+                ),
+                "expected_annual_cost_saving_usd": float(
+                    top_opportunity["annual_saving_usd"]
+                ),
+                "priority": top_opportunity["priority_level"],
+            }
+
+            st.success(
+                "Opportunity prepared for the Action Tracker."
+            )
 
 
 def render_action_tracker() -> None:
@@ -1578,8 +2343,11 @@ def render_action_tracker() -> None:
         and monitor implementation progress.
         """
     )
+
     if "actions" not in st.session_state:
         st.session_state.actions = load_actions()
+
+    pending_opportunity = st.session_state.get("pending_opportunity")
 
     opportunity_options = [
         "Compressed-air leak repair",
@@ -1613,33 +2381,49 @@ def render_action_tracker() -> None:
         },
     }
 
+    default_opportunity_index = 0
+
+    if pending_opportunity:
+        pending_title = pending_opportunity.get("action_title")
+
+        if pending_title in opportunity_options:
+            default_opportunity_index = opportunity_options.index(
+                pending_title
+            )
+
     selected_opportunity = st.radio(
         "Select opportunity",
         opportunity_options,
+        index=default_opportunity_index,
     )
 
     if selected_opportunity == "Custom action":
+        action_title = st.text_input("Custom action title")
         default_co2 = 0.0
         default_saving = 0.0
-    else:
-        default_co2 = opportunity_defaults[
-            selected_opportunity
-        ]["co2"]
 
-        default_saving = opportunity_defaults[
-            selected_opportunity
-        ]["saving"]
-
-    if selected_opportunity == "Custom action":
-        action_title = st.text_input("Custom action title")
     else:
         action_title = selected_opportunity
-    with st.form("action_form"):
 
+        if (
+            pending_opportunity
+            and pending_opportunity.get("action_title")
+            == selected_opportunity
+        ):
+            default_co2 = float(
+                pending_opportunity.get(
+                    "expected_co2_reduction_tco2",
+                    0.0,
+                )
+            )
 
-        if selected_opportunity == "Custom action":
-            default_co2 = 0.0
-            default_saving = 0.0
+            default_saving = float(
+                pending_opportunity.get(
+                    "expected_annual_cost_saving_usd",
+                    0.0,
+                )
+            )
+
         else:
             default_co2 = opportunity_defaults[
                 selected_opportunity
@@ -1648,8 +2432,19 @@ def render_action_tracker() -> None:
             default_saving = opportunity_defaults[
                 selected_opportunity
             ]["saving"]
-            
 
+    priority_options = ["Low", "Medium", "High", "Critical"]
+    default_priority_index = 0
+
+    if pending_opportunity:
+        pending_priority = pending_opportunity.get("priority")
+
+        if pending_priority in priority_options:
+            default_priority_index = priority_options.index(
+                pending_priority
+            )
+
+    with st.form("action_form"):
         owner = st.radio(
             "Owner",
             [
@@ -1664,7 +2459,8 @@ def render_action_tracker() -> None:
 
         priority = st.radio(
             "Priority",
-            ["Low", "Medium", "High", "Critical"],
+            priority_options,
+            index=default_priority_index,
         )
 
         status = st.radio(
@@ -1677,7 +2473,7 @@ def render_action_tracker() -> None:
         expected_co2_reduction = st.number_input(
             "Expected CO₂ reduction (tCO₂)",
             min_value=0.0,
-            value=default_co2,
+            value=float(default_co2),
             step=1.0,
             key=f"co2_{selected_opportunity}",
         )
@@ -1685,24 +2481,25 @@ def render_action_tracker() -> None:
         expected_cost_saving = st.number_input(
             "Expected annual cost saving ($)",
             min_value=0.0,
-            value=default_saving,
+            value=float(default_saving),
             step=1000.0,
             key=f"saving_{selected_opportunity}",
         )
-        
 
         notes = st.text_area("Notes")
 
         submitted = st.form_submit_button("Create action")
 
     if submitted:
-        if not action_title.strip():
+        cleaned_title = action_title.strip()
+
+        if not cleaned_title:
             st.error("Action title is required.")
 
         else:
             duplicate_exists = any(
                 action.get("action_title", "").strip().lower()
-                == action_title.strip().lower()
+                == cleaned_title.lower()
                 and action.get("status") != "Completed"
                 for action in st.session_state.actions
             )
@@ -1715,7 +2512,7 @@ def render_action_tracker() -> None:
             else:
                 st.session_state.actions.append(
                     {
-                        "action_title": action_title.strip(),
+                        "action_title": cleaned_title,
                         "owner": owner.strip(),
                         "priority": priority,
                         "status": status,
@@ -1731,6 +2528,7 @@ def render_action_tracker() -> None:
                 )
 
                 save_actions(st.session_state.actions)
+                st.session_state.pop("pending_opportunity", None)
 
                 st.success("Action created successfully.")
 
@@ -1740,33 +2538,25 @@ def render_action_tracker() -> None:
         st.info("No actions have been created yet.")
         return
 
-    actions_dataframe = pd.DataFrame(
-        st.session_state.actions
-    )
+    actions_dataframe = pd.DataFrame(st.session_state.actions)
 
     total_actions = len(actions_dataframe)
 
     completed_actions = int(
-        actions_dataframe["status"]
-        .eq("Completed")
-        .sum()
+        actions_dataframe["status"].eq("Completed").sum()
     )
 
     open_actions = int(
         (~actions_dataframe["status"].eq("Completed")).sum()
     )
 
-    total_co2_reduction = (
-        actions_dataframe[
-            "expected_co2_reduction_tco2"
-        ].sum()
-    )
+    total_co2_reduction = actions_dataframe[
+        "expected_co2_reduction_tco2"
+    ].sum()
 
-    total_cost_saving = (
-        actions_dataframe[
-            "expected_annual_cost_saving_usd"
-        ].sum()
-    )
+    total_cost_saving = actions_dataframe[
+        "expected_annual_cost_saving_usd"
+    ].sum()
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -1785,13 +2575,13 @@ def render_action_tracker() -> None:
 
     edited_actions = st.data_editor(
         actions_dataframe,
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
         num_rows="dynamic",
         column_config={
             "priority": st.column_config.SelectboxColumn(
                 "Priority",
-                options=["Low", "Medium", "High", "Critical"],
+                options=priority_options,
             ),
             "status": st.column_config.SelectboxColumn(
                 "Status",
