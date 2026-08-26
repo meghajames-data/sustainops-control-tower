@@ -99,10 +99,27 @@ st.markdown(
     .stNumberInput input,
     .stDateInput input,
     .stTextArea textarea {
-        background: rgba(255,255,255,0.07) !important;
-        color: #FFFFFF !important;
-        border: 1px solid rgba(134,239,172,0.28) !important;
+        background: #F0FDF4 !important;
+        color: #14532D !important;
+        border: 1px solid #86EFAC !important;
         border-radius: 10px !important;
+        font-weight: 600 !important;
+    }
+    .stTextInput input::placeholder,
+    .stNumberInput input::placeholder,
+    .stDateInput input::placeholder,
+    .stTextArea textarea::placeholder {
+        color: #4B7A5D !important;
+        opacity: 1 !important;
+    }
+    .stNumberInput button {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        border-color: #86EFAC !important;
+    }
+
+    .stNumberInput button * {
+        color: #14532D !important;
     }
 
     div[data-baseweb="select"] > div {
@@ -591,13 +608,56 @@ st.markdown(
     }
 
     /* Inputs on dark background should remain readable */
-    .stTextInput input,
-    .stNumberInput input,
-    .stDateInput input,
-    .stTextArea textarea {
-        background: rgba(255,255,255,0.07) !important;
-        color: #FFFFFF !important;
-    }
+/* ===== FORCE INPUT TEXT TO DARK GREEN ===== */
+
+div[data-testid="stNumberInput"] input,
+div[data-testid="stTextInput"] input,
+div[data-testid="stDateInput"] input,
+div[data-testid="stTextArea"] textarea {
+    background-color: #F0FDF4 !important;
+
+    color: #14532D !important;
+    -webkit-text-fill-color: #14532D !important;
+
+    border-color: #86EFAC !important;
+
+    font-weight: 600 !important;
+    opacity: 1 !important;
+}
+
+
+/* Number input + and - buttons */
+div[data-testid="stNumberInput"] button {
+    background-color: #DCFCE7 !important;
+    color: #14532D !important;
+}
+
+div[data-testid="stNumberInput"] button svg {
+    fill: #14532D !important;
+    color: #14532D !important;
+}
+
+
+/* Placeholder text */
+div[data-testid="stNumberInput"] input::placeholder,
+div[data-testid="stTextInput"] input::placeholder,
+div[data-testid="stDateInput"] input::placeholder,
+div[data-testid="stTextArea"] textarea::placeholder {
+    color: #4B7A5D !important;
+    -webkit-text-fill-color: #4B7A5D !important;
+    opacity: 1 !important;
+}
+
+
+/* Focus state */
+div[data-testid="stNumberInput"] input:focus,
+div[data-testid="stTextInput"] input:focus,
+div[data-testid="stDateInput"] input:focus,
+div[data-testid="stTextArea"] textarea:focus {
+    color: #14532D !important;
+    -webkit-text-fill-color: #14532D !important;
+    border-color: #22C55E !important;
+}
 
     /* Keep green information/metric cards dark enough for white text */
     div[data-testid="stMetric"],
@@ -612,6 +672,205 @@ st.markdown(
     .module-card *,
     .sustainops-hero * {
         color: inherit;
+    }
+
+    
+    /* =================================================
+       FINAL FORM + DROPDOWN + SLIDER VISIBILITY FIXES
+       ================================================= */
+
+    /* ---------- INPUT FIELDS ---------- */
+    div[data-testid="stNumberInput"] input,
+    div[data-testid="stTextInput"] input,
+    div[data-testid="stDateInput"] input,
+    div[data-testid="stTextArea"] textarea,
+    div[data-baseweb="input"] input,
+    div[data-baseweb="textarea"] textarea {
+        background-color: #F0FDF4 !important;
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+        caret-color: #14532D !important;
+        border-color: #86EFAC !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+
+    div[data-testid="stNumberInput"] div[data-baseweb="input"],
+    div[data-testid="stTextInput"] div[data-baseweb="input"],
+    div[data-testid="stDateInput"] div[data-baseweb="input"] {
+        background-color: #F0FDF4 !important;
+        border-color: #86EFAC !important;
+    }
+
+    div[data-testid="stNumberInput"] div[data-baseweb="input"] *,
+    div[data-testid="stTextInput"] div[data-baseweb="input"] *,
+    div[data-testid="stDateInput"] div[data-baseweb="input"] *,
+    div[data-testid="stTextArea"] div[data-baseweb="textarea"] * {
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+    }
+
+    div[data-testid="stNumberInput"] input::placeholder,
+    div[data-testid="stTextInput"] input::placeholder,
+    div[data-testid="stDateInput"] input::placeholder,
+    div[data-testid="stTextArea"] textarea::placeholder,
+    div[data-baseweb="input"] input::placeholder,
+    div[data-baseweb="textarea"] textarea::placeholder {
+        color: #4B7A5D !important;
+        -webkit-text-fill-color: #4B7A5D !important;
+        opacity: 1 !important;
+        font-weight: 500 !important;
+    }
+
+    /* +/- buttons for number fields */
+    div[data-testid="stNumberInput"] button {
+        background-color: #DCFCE7 !important;
+        color: #14532D !important;
+        border-color: #86EFAC !important;
+    }
+
+    div[data-testid="stNumberInput"] button *,
+    div[data-testid="stNumberInput"] button svg {
+        color: #14532D !important;
+        fill: #14532D !important;
+        stroke: #14532D !important;
+    }
+
+    /* Date icon */
+    div[data-testid="stDateInput"] svg {
+        color: #14532D !important;
+        fill: #14532D !important;
+    }
+
+    /* Focus state */
+    div[data-testid="stNumberInput"] input:focus,
+    div[data-testid="stTextInput"] input:focus,
+    div[data-testid="stDateInput"] input:focus,
+    div[data-testid="stTextArea"] textarea:focus,
+    div[data-baseweb="input"] input:focus,
+    div[data-baseweb="textarea"] textarea:focus {
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+        border-color: #22C55E !important;
+        box-shadow: 0 0 0 1px #22C55E !important;
+        outline: none !important;
+    }
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+        -webkit-text-fill-color: #14532D !important;
+        -webkit-box-shadow: 0 0 0 1000px #F0FDF4 inset !important;
+        transition: background-color 9999s ease-out 0s;
+    }
+
+    /* ---------- SELECTBOX / DROPDOWN ---------- */
+
+    /* Closed select box */
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+        background-color: #123A27 !important;
+        border: 1px solid #86EFAC !important;
+        color: #FFFFFF !important;
+    }
+
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] span {
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+    }
+
+    /* Dropdown arrow */
+    div[data-testid="stSelectbox"] svg {
+        color: #86EFAC !important;
+        fill: #86EFAC !important;
+        stroke: #86EFAC !important;
+        opacity: 1 !important;
+    }
+
+    /* Open dropdown menu */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] ul,
+    ul[role="listbox"] {
+        background-color: #DCFCE7 !important;
+        border-color: #166534 !important;
+    }
+
+    /* Options */
+    li[role="option"] {
+        background-color: #DCFCE7 !important;
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+        font-weight: 600 !important;
+    }
+
+    li[role="option"] *,
+    ul[role="listbox"] li * {
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+    }
+
+    li[role="option"]:hover {
+        background-color: #BBF7D0 !important;
+        color: #14532D !important;
+    }
+
+    li[role="option"][aria-selected="true"] {
+        background-color: #86EFAC !important;
+        color: #14532D !important;
+        font-weight: 800 !important;
+    }
+
+    /* ---------- MULTISELECT ---------- */
+
+    div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
+        background-color: #123A27 !important;
+        border: 1px solid #86EFAC !important;
+    }
+
+    div[data-testid="stMultiSelect"] svg {
+        color: #86EFAC !important;
+        fill: #86EFAC !important;
+        stroke: #86EFAC !important;
+        opacity: 1 !important;
+    }
+
+    span[data-baseweb="tag"] {
+        background-color: #4ADE80 !important;
+        border-color: #86EFAC !important;
+    }
+
+    span[data-baseweb="tag"] * {
+        color: #062412 !important;
+        -webkit-text-fill-color: #062412 !important;
+        fill: #062412 !important;
+        font-weight: 700 !important;
+    }
+
+    /* ---------- SLIDERS ---------- */
+
+    /* Entire visible rail */
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div,
+    div[data-testid="stSlider"] div[data-baseweb="slider"] > div > div,
+    div[data-testid="stSlider"] [data-baseweb="slider"] [role="presentation"],
+    div[data-testid="stSlider"] [data-baseweb="slider"] div[style*="background"] {
+        background: #86EFAC !important;
+        background-color: #86EFAC !important;
+    }
+
+    /* Thumb */
+    div[data-testid="stSlider"] div[role="slider"] {
+        background: #BBF7D0 !important;
+        background-color: #BBF7D0 !important;
+        border: 2px solid #166534 !important;
+        box-shadow: 0 0 0 2px rgba(187,247,208,0.35) !important;
+    }
+
+    /* Value bubble */
+    div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+        background: #DCFCE7 !important;
+        color: #14532D !important;
+        -webkit-text-fill-color: #14532D !important;
+        border: 1px solid #166534 !important;
+        font-weight: 700 !important;
     }
 
     </style>
@@ -1088,8 +1347,6 @@ def render_manufacturing(
         machine_summary["performance_score"] < 60,
         "status",
     ] = "Critical"
-    st.divider()
-
     st.subheader("Machine Health and Priority Queue")
 
     priority_table = machine_summary[
@@ -1335,7 +1592,12 @@ def render_energy(
         )
 
         energy_fig.update_layout(
-            title={"text": "⚡ Average Energy Use by Hour", "x": 0.02, "xanchor": "left"},
+            title={
+                "text": "⚡ Average Energy Use by Hour",
+                "x": 0.02,
+                "xanchor": "left",
+                "font": {"color": "#FFFFFF", "size": 20},
+            },
             height=430,
             margin=dict(l=20, r=20, t=65, b=20),
             paper_bgcolor="rgba(0,0,0,0)",
@@ -1391,7 +1653,12 @@ def render_energy(
         )
 
         co2_fig.update_layout(
-            title={"text": "🌱 Average CO₂ Emissions by Hour", "x": 0.02, "xanchor": "left"},
+            title={
+                "text": "🌱 Average CO₂ Emissions by Hour",
+                "x": 0.02,
+                "xanchor": "left",
+                "font": {"color": "#FFFFFF", "size": 20},
+            },
             height=430,
             margin=dict(l=20, r=20, t=65, b=20),
             paper_bgcolor="rgba(0,0,0,0)",
@@ -2693,4 +2960,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main()  
